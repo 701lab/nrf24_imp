@@ -6,7 +6,7 @@ NRF24L01+ implementation-independent library.
 ## How to use 
 1. your project should have implementation.h and implementation.c files with all required functions (list of such functions further in the text);
 2. add this library to your project;
-3. #include nrf24l01p_imp.h into your project;
+3. include nrf24l01p_imp.h file into your project;
 4. declare NRF24L01+ object (further in the text);
 5. write your code using this library.
 
