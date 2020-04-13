@@ -81,11 +81,11 @@ int main()
 
 ```
 
-### Workflows
+## Workflows
 
-In all following examples it is considered, that struct **nrf24l01p.h** file is included and **example_nrf24** struct is initialized.
+In all following examples it is considered, that struct **nrf24l01p.h** file is included and **example_nrf24** struct is initialized. To understand more about functions and parameters look into nrf24l01p.c file.
 
-#### Basic TX mode
+### Basic TX mode
 
 ```C
 // @file main.c 
@@ -101,12 +101,59 @@ int main()
 {
 // ... - example_nrf24 struct and other initalizations
 
-nrf24_basic_init(&example_nrf24); 	// Must be called for every nrf24l01+ instance before other initializations.
+// Must be called for every nrf24l01+ instance before other initializations.
+nrf24_basic_init(&example_nrf24); 	
 
-nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx); // This function is called to set new tx addres. 
-							 // Address must be the same as one of RX addresses on receiver.
+// This function is called to set new tx addres. Address must be the same as one of RX addresses on receiver.
+nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx);  
+
+// Must be called for any nrf24l01+ instance to enable tx mode.
+nrf24_tx_mode(&robot_nrf24); 		
+
+// Other project code
+
+	while(1)
+	{
+		// ... some code 
+
+		// When it is time to send data
+		nrf24_send_message(&example_nrf24, array_to_send, sizeof(array_to_send), 1); 
+	}
+}
+
+```
+
+### Basic RX mode
+
+```C
+// @file main.c 
+#include "nrf24l01p.h"
+
+// Some initialization code
+
+uint32_t array_to_receive = {0, 0, 0};
+
+uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+uint8_t pip3_address = 0x77;
+uin8_t pip5_address = 0x99;
+
+int main()
+{
+// ... - example_nrf24 struct and other initalizations
+
+// Must be called for every nrf24l01+ instance before other initializations.
+nrf24_basic_init(&example_nrf24); 	
+
+// This function should be called even if not pipe 1 is used to receive data because 4 first bytes of addresses of all pipes
+// are the same as pip1 and must set up through pipe1. Only last byte of every pipe rx address must be different.
+nrf24_enable_pipe1(&example_nrf24, pipe1_rx_address);	
+
+// Can be called to enable pipe 2-5 if needed. Only last byte of the address is used as input. Pther 4 are the same as of pipe 1.
+nrf24_enable_pipe2_5(&example_nrf24, 3, pip3_address);
+nrf24_enable_pipe2_5(&example_nrf24, 5, pip5_address);
 							 
-nrf24_tx_mode(&robot_nrf24); 		// Must be called for any nrf24l01+ instance to enable tx mode.
+// Must be called for any nrf24l01+ instance to enable rx mode.						 
+nrf24_rx_mode(&robot_nrf24); 		
 
 // Other project code
 
@@ -114,22 +161,80 @@ nrf24_tx_mode(&robot_nrf24); 		// Must be called for any nrf24l01+ instance to e
 	{
 	// ... some code 
 	
-	// When it is time to send data
-	nrf24_send_message(&example_nrf24, array_to_send, sizeof(array_to_send), 1); 
+		// To receive data we should check if anything new is available.
+		if(nrf24_is_new_data_availiable(&example_nrf24))
+		{
+			// Read new data
+			nrf24_read_message(&example_nrf24, array_to_receive, sizeof(array_to_receive));
+			// ... Do something with new data
+		}
+		
 	}
 }
 
 ```
 
+### Using both RX and TX on a single device
 
+```C
+// @file main.c 
+#include "nrf24l01p.h"
 
+// Some initialization code
 
-#### Declaration in global variable space 
+uint32_t array_to_receive = {0, 0, 0};
+uint32_t array_to_send = {1, 2, 3};
 
+uint8_t tx_address = {0x55, 0x44, 0x33, 0x22, 0x11}; // Must be 5 bytes long
+uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long. 
+uint8_t pip3_address = 0x77;
 
+int main()
+{
+// ... - example_nrf24 struct and other initalizations
 
-## Examples
+// Must be called for every nrf24l01+ instance before other initializations.
+nrf24_basic_init(&example_nrf24); 	
 
+// Set RX and TX addresses
+nrf24_enable_pipe1(&example_nrf24, pipe1_rx_address);	
+nrf24_enable_pipe2_5(&example_nrf24, 3, pip3_address);
+nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx);  
+			
+// In two-sided mode it is better to keep nrf24l01 + in receive mode all the time when it should not transmit data.
+nrf24_rx_mode(&robot_nrf24); 		
+
+// Other project code
+
+	while(1)
+	{
+	// ... some code 
+	
+		// Receive data if availiable
+		if(nrf24_is_new_data_availiable(&example_nrf24))
+		{
+			// Read new data
+			nrf24_read_message(&example_nrf24, array_to_receive, sizeof(array_to_receive));
+			// ... Do something with new data
+		}
+		
+		// When it is time to transmit message
+		nrf24_tx_mode(&robot_nrf24); // Switch to TX mode.
+		nrf24_send_message(&example_nrf24, array_to_send, sizeof(array_to_send), 1); 
+		
+		// Probably it is better to make a small delay cause device needs some time to get into TX mode and send data.
+		
+		nrf24_rx_mode(&robot_nrf24); // Get back to RX mode.
+	}
+}
+
+```
+
+## A little bit more useful information
+
+### Interrupt handling 
+
+## error handling
 
 ## What is not implemented
 - received power detection (RPD) reading and handling;
@@ -138,3 +243,5 @@ nrf24_tx_mode(&robot_nrf24); 		// Must be called for any nrf24l01+ instance to e
 - payload reusing in RX mode;
 - all devices are configured to use 2 byte CRC;
 - dynamic payload size and sending data with ack are not implemented.
+
+**I hope now you know how to use this library. One more time. If you have any problems with the library feel free to use issues and pull requests to ask questions suggest features and make fixes**
