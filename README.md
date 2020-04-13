@@ -60,6 +60,12 @@ An example of the initialization of the struct. CE is on PB0, CSN is on PB1, SPI
 // @file main.c 
 #include "nrf24l01p.h"
 
+uint8_t spi1_write_single_byte(uint8_t byte_to_be_sent);
+void gpiob1_high(void);
+void gpiob1_low(void);
+void gpiob0_high(void);
+void gpiob0_low(void);
+
 // Some initialization code
 
 nrf24l01p example_nrf24 = {.device_was_initialized = 0};
