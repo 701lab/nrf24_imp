@@ -54,9 +54,7 @@ It is possible to control multiple nrf24l01+ devices with the same SPI (so the s
   - nrf24_2_mbps - 2 MBps;
 - _device_was_initialized_ - internal variable, used for error checking. Must be initialized with 0. Must not be changed by the user program.
 
-
-
-#### Declaration in global variable space 
+An example of the initialization of the struct. CE is on PB0, CSN is on PB1, SPI1 is used for communication (STM32):
 
 ```C
 // @file main.c 
@@ -68,12 +66,11 @@ nrf24l01p example_nrf24 = {.device_was_initialized = 0};
 
 int main()
 {
-
 	example_nrf24.csn_high = gpiob1_high;
 	example_nrf24.csn_low = gpiob1_low;
 	example_nrf24.ce_high = gpiob0_high;
 	example_nrf24.ce_low = gpiob0_low;
-  example_nrf24.spi_write_byte = spi1_write_single_byte;
+ 	example_nrf24.spi_write_byte = spi1_write_single_byte;
 	example_nrf24.frequency_channel = 45;
 	example_nrf24.payload_size_in_bytes = 12;
 	example_nrf24.power_output = nrf24_pa_high;
@@ -83,6 +80,53 @@ int main()
 }
 
 ```
+
+### Workflows
+
+In all following examples it is considered, that struct **nrf24l01p.h** file is included and **example_nrf24** struct is initialized.
+
+#### Basic TX mode
+
+```C
+// @file main.c 
+#include "nrf24l01p.h"
+
+// Some initialization code
+
+uint32_t array_to_send = {1, 2, 3};
+
+uint8_t tx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+
+int main()
+{
+// ... - example_nrf24 struct and other initalizations
+
+nrf24_basic_init(&example_nrf24); 	// Must be called for every nrf24l01+ instance before other initializations.
+
+nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx); // This function is called to set new tx addres. 
+							 // Address must be the same as one of RX addresses on receiver.
+							 
+nrf24_tx_mode(&robot_nrf24); 		// Must be called for any nrf24l01+ instance to enable tx mode.
+
+// Other project code
+
+	while(1)
+	{
+	// ... some code 
+	
+	// When it is time to send data
+	nrf24_send_message(&example_nrf24, array_to_send, sizeof(array_to_send), 1); 
+	}
+}
+
+```
+
+
+
+
+#### Declaration in global variable space 
+
+
 
 ## Examples
 
