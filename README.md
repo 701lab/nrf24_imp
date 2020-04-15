@@ -238,9 +238,43 @@ nrf24_rx_mode(&robot_nrf24);
 
 ## A little bit more useful information
 
-### Interrupt handling 
+### Interrupt handling
+
+NRF24l01+ has 3 interrupt sources:
+- Rt interrupt (called when new message received);
+- TX interrupt (called when the message is successfully transmitted);
+- MAX_RT interrupt (called when the message was retransmitted maximum amount of times without acknowledgment).
+
+By default library disables all interrupts on the IRQ pin. To enable interrupts you should call:
+
+```C
+//... some code
+
+nrf24_enable_interrupts(&example_nrf24, 1, 1, 0);
+
+//... also some code 
+```
+
+Where each parameter describes the corresponding interrupts state with respect to the list above. "1" means that particular interrupt will be enabled, "0" means that particular interrupt will be disabled.
+
+The programmer should implement an external interrupt handler on the pin connected to IRQ of nrf24l01+. The interrupt is signalized only by the pin high to low transition. So low to high transition on the IRQ pin should not be interpreted as an interrupt.
+
+To understand what type of interrupt occurred in interrupt handler nrf24_get_interrupts_status function should be called:
+
+```C
+void my_interrupt_nadler()
+{
+	uint8_t interrupt_state = nrf24_get_interrupts_status(&example_nrf24);
+
+	// Some type of handling (reading from, or writing to the device atc).
+}
+
+```
+This function returns STATUS register with only interrupts-related bits masked. This means that 1 in bits 4-6 will mean that either MAX_RT, TRX_DR or RX_DR interrupt occurred respectively an all other bits will always be 0. So return value can be - 0x00 if no interrupts occurred and from 0x10 to 0x70 if any interrupts occurred. After reading interrupts states this functions clears register. So immediate second call will for sure return 0x00 as no interrupts occurred since the last call of the same function.
 
 ## error handling
+
+
 
 ## What is not implemented
 - received power detection (RPD) reading and handling;
