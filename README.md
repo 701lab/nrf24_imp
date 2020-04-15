@@ -274,7 +274,30 @@ This function returns STATUS register with only interrupts-related bits masked. 
 
 ## error handling
 
+Most of the functions in the library return error codes if any error occured or 0 otherwise. All return codes are stored in **nrf24l01p_mistakes.h file**. Also programmer can change mistakes offset to the desired bye defining NRF24L01P_MISTAAKES_OFFSET before #include "nrf24l01p.h.
 
+The two only function that return something other than mistakes codes are: nrf24_is_new_data_availiable (returns number of pipe from which last recieved message was received or 0 if no messages are in RX FIFO), nrf24_get_interrupts_status (returns interrupts statuses).
+
+With all other functions, it is recommended to check for mistakes. For example, if nrf24_basic_init returns mistake device probably isn't set up and won't work. In general, you can have some type of mistakes array that contains all mistakes codes, that occurred during runtime and a function to write to such an array, for example, **void add_to_mistakes_log(uint32_t mistake-code)**. Then your code can look something like that:
+
+```C
+int main()
+{
+	//... Some setups
+	add_to_mistakes_log(nrf24_basic_init(&example_nrf24));
+	add_to_mistakes_log(nrf24_enable_pipe1(&example_nrf24, new_addr_for_nrf));
+	add_to_mistakes_log(nrf24_rx_mode(&example_nrf24));
+	//... Some setups
+	
+	while(1)
+	{
+		//... Some code 
+		add_to_mistakes_log(nrf24_send_message(&example_nrf24, nrf_data, 12, yes));
+	}
+}
+```
+
+After that, you will be able to debug your device in a more controlled way.
 
 ## What is not implemented
 - received power detection (RPD) reading and handling;
