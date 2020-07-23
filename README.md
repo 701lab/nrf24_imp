@@ -61,9 +61,9 @@ An example of the initialization of the struct. CE is on PB0, CSN is on PB1, SPI
 #include "nrf24l01p.h"
 
 uint8_t spi1_write_single_byte(uint8_t byte_to_be_sent);
-void gpiob1_high(void);
+void gpiob1_high(void); // PB1 connected to CSN
 void gpiob1_low(void);
-void gpiob0_high(void);
+void gpiob0_high(void); // PB0 connected to CE
 void gpiob0_low(void);
 
 // Some initialization code
@@ -99,9 +99,9 @@ In all following examples it is considered, that struct **nrf24l01p.h** file is 
 
 // Some initialization code
 
-uint32_t array_to_send = {1, 2, 3};
+uint32_t array_to_send[3] = {1, 2, 3};
 
-uint8_t tx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+uint8_t tx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
 
 int main()
 {
@@ -137,9 +137,9 @@ nrf24_tx_mode(&robot_nrf24);
 
 // Some initialization code
 
-uint32_t array_to_receive = {0, 0, 0};
+uint32_t array_to_receive[3] = {0, 0, 0};
 
-uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+uint8_t pipe1_rx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
 uint8_t pip3_address = 0x77;
 uin8_t pip5_address = 0x99;
 
@@ -188,11 +188,11 @@ nrf24_rx_mode(&robot_nrf24);
 
 // Some initialization code
 
-uint32_t array_to_receive = {0, 0, 0};
-uint32_t array_to_send = {1, 2, 3};
+uint32_t array_to_receive[3] = {0, 0, 0};
+uint32_t array_to_send[3] = {1, 2, 3};
 
-uint8_t tx_address = {0x55, 0x44, 0x33, 0x22, 0x11}; // Must be 5 bytes long
-uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long. 
+uint8_t tx_address[5] = {0x55, 0x44, 0x33, 0x22, 0x11}; // Must be 5 bytes long
+uint8_t pipe1_rx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long. 
 uint8_t pip3_address = 0x77;
 
 int main()
