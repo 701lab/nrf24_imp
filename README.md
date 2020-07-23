@@ -61,9 +61,9 @@ An example of the initialization of the struct. CE is on PB0, CSN is on PB1, SPI
 #include "nrf24l01p.h"
 
 uint8_t spi1_write_single_byte(uint8_t byte_to_be_sent);
-void gpiob1_high(void);
+void gpiob1_high(void); // PB1 connected to CSN
 void gpiob1_low(void);
-void gpiob0_high(void);
+void gpiob0_high(void); // PB0 connected to CE
 void gpiob0_low(void);
 
 // Some initialization code
@@ -99,9 +99,9 @@ In all following examples it is considered, that struct **nrf24l01p.h** file is 
 
 // Some initialization code
 
-uint32_t array_to_send = {1, 2, 3};
+uint32_t array_to_send[3] = {1, 2, 3};
 
-uint8_t tx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+uint8_t tx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
 
 int main()
 {
@@ -111,10 +111,10 @@ int main()
 nrf24_basic_init(&example_nrf24); 	
 
 // This function is called to set new tx addres. Address must be the same as one of RX addresses on receiver.
-nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx);  
+nrf24_set_tx_address(&example_nrf24, new_addr_for_nrf_tx);  
 
 // Must be called for any nrf24l01+ instance to enable tx mode.
-nrf24_tx_mode(&robot_nrf24); 		
+nrf24_tx_mode(&example_nrf24); 		
 
 // Other project code
 
@@ -137,9 +137,9 @@ nrf24_tx_mode(&robot_nrf24);
 
 // Some initialization code
 
-uint32_t array_to_receive = {0, 0, 0};
+uint32_t array_to_receive[3] = {0, 0, 0};
 
-uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
+uint8_t pipe1_rx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long
 uint8_t pip3_address = 0x77;
 uin8_t pip5_address = 0x99;
 
@@ -159,7 +159,7 @@ nrf24_enable_pipe2_5(&example_nrf24, 3, pip3_address);
 nrf24_enable_pipe2_5(&example_nrf24, 5, pip5_address);
 							 
 // Must be called for any nrf24l01+ instance to enable rx mode.						 
-nrf24_rx_mode(&robot_nrf24); 		
+nrf24_rx_mode(&example_nrf24); 		
 
 // Other project code
 
@@ -188,11 +188,11 @@ nrf24_rx_mode(&robot_nrf24);
 
 // Some initialization code
 
-uint32_t array_to_receive = {0, 0, 0};
-uint32_t array_to_send = {1, 2, 3};
+uint32_t array_to_receive[3] = {0, 0, 0};
+uint32_t array_to_send[3] = {1, 2, 3};
 
-uint8_t tx_address = {0x55, 0x44, 0x33, 0x22, 0x11}; // Must be 5 bytes long
-uint8_t pipe1_rx_address = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long. 
+uint8_t tx_address[5] = {0x55, 0x44, 0x33, 0x22, 0x11}; // Must be 5 bytes long
+uint8_t pipe1_rx_address[5] = {0x11, 0x22, 0x33, 0x44, 0x55}; // Must be 5 bytes long. 
 uint8_t pip3_address = 0x77;
 
 int main()
@@ -205,10 +205,10 @@ nrf24_basic_init(&example_nrf24);
 // Set RX and TX addresses
 nrf24_enable_pipe1(&example_nrf24, pipe1_rx_address);	
 nrf24_enable_pipe2_5(&example_nrf24, 3, pip3_address);
-nrf24_set_tx_address(&robot_nrf24, new_addr_for_nrf_tx);  
+nrf24_set_tx_address(&example_nrf24, new_addr_for_nrf_tx);  
 			
 // In two-sided mode it is better to keep nrf24l01 + in receive mode all the time when it should not transmit data.
-nrf24_rx_mode(&robot_nrf24); 		
+nrf24_rx_mode(&example_nrf24); 		
 
 // Other project code
 
@@ -225,12 +225,12 @@ nrf24_rx_mode(&robot_nrf24);
 		}
 		
 		// When it is time to transmit message
-		nrf24_tx_mode(&robot_nrf24); // Switch to TX mode.
+		nrf24_tx_mode(&example_nrf24); // Switch to TX mode.
 		nrf24_send_message(&example_nrf24, array_to_send, sizeof(array_to_send), 1); 
 		
 		// Probably it is better to make a small delay cause device needs some time to get into TX mode and send data.
 		
-		nrf24_rx_mode(&robot_nrf24); // Get back to RX mode.
+		nrf24_rx_mode(&example_nrf24); // Get back to RX mode.
 	}
 }
 
