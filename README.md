@@ -272,7 +272,7 @@ void my_interrupt_nadler()
 ```
 This function returns STATUS register with only interrupts-related bits masked. This means that 1 in bits 4-6 will mean that either MAX_RT, TRX_DR or RX_DR interrupt occurred respectively an all other bits will always be 0. So return value can be - 0x00 if no interrupts occurred and from 0x10 to 0x70 if any interrupts occurred. After reading interrupts states this functions clears register. So immediate second call will for sure return 0x00 as no interrupts occurred since the last call of the same function.
 
-## error handling
+## Error handling
 
 Most of the functions in the library return error codes if any error occured or 0 otherwise. All return codes are stored in **nrf24l01p_mistakes.h file**. Also programmer can change mistakes offset to the desired bye defining NRF24L01P_MISTAAKES_OFFSET before #include "nrf24l01p.h.
 
