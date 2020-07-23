@@ -204,6 +204,7 @@ uint32_t nrf24_tx_mode(nrf24l01p *nrf24_instance)
 	uint8_t current_register_state = nrf24_instance->spi_write_byte(NRF24_NOP);
 	nrf24_instance->csn_high();
 
+
 	// Add power up to current config
 	current_register_state &= ~NRF24_PRIM_RX;
 
@@ -224,7 +225,8 @@ uint32_t nrf24_tx_mode(nrf24l01p *nrf24_instance)
 	nrf24_instance->spi_write_byte(NRF24_INTERRUPTS_MASK);
 	nrf24_instance->csn_high();
 
-	return 0;
+//	return 0;
+	return current_register_state;
 }
 
 // ******************* Function ******************* //
@@ -452,6 +454,12 @@ uint32_t nrf24_send_message(nrf24l01p *nrf24_instance,  void *payload, uint32_t 
 		mistake_code = NRF24_WRONG_MESSAGE_SIZE;
 	}
 
+	// Reset all interrupt flags
+	nrf24_instance->csn_low();
+	nrf24_instance->spi_write_byte(NRF24_W_REGISTER | NRF24_STATUS);
+	nrf24_instance->spi_write_byte(NRF24_INTERRUPTS_MASK);
+	nrf24_instance->csn_high();
+
 	// Data will be sent byte by byte
 	uint8_t *current_byte_to_send = payload;
 
@@ -477,7 +485,7 @@ uint32_t nrf24_send_message(nrf24l01p *nrf24_instance,  void *payload, uint32_t 
 
 	// Send device into the Tx mode to send one payload
 	nrf24_instance->ce_high();
-	for ( int i = 0; i < 500; ++i ){}
+	for ( int i = 0; i < 1000; ++i ){}
 	nrf24_instance->ce_low();
 
 	return mistake_code;
