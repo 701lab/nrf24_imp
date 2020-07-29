@@ -80,6 +80,15 @@ uint32_t nrf24_basic_init(nrf24l01p *nrf24_instance)
 	nrf24_instance->spi_write_byte(NRF24_INTERRUPTS_MASK);
 	nrf24_instance->csn_high();
 
+	// If data rate is 250kbps, set retransmission delay to 750us (datasheet recommended is 500us at 250kbps) and retransmission count to 2
+	if (nrf24_instance->data_rate == nrf24_250_kbps)
+	{
+		nrf24_instance->csn_low();
+		nrf24_instance->spi_write_byte(NRF24_W_REGISTER | NRF24_SETUP_RETR);
+		nrf24_instance->spi_write_byte(0x2 | nrf24_wait_1000_us);
+		nrf24_instance->csn_high();
+	}
+
 	// Check if payload size is correct. If needed change value and throw mistake. Then write value for pipe 0
 	if ( nrf24_instance->payload_size_in_bytes < 0 )
 	{
