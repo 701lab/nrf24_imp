@@ -447,11 +447,19 @@ uint32_t nrf24_enable_pipe2_5(nrf24l01p *nrf24_instance, uint32_t pipe_number, u
 	@return first found mistake code or 0 if no mistakes were found
  */
 // ************************************************ //
-uint32_t nrf24_send_message(nrf24l01p *nrf24_instance,  void *payload, uint32_t payload_size_in_bytes, int32_t should_send_ack)
+uint32_t nrf24_send_message(nrf24l01p *nrf24_instance,  void *payload, uint32_t payload_size_in_bytes, int32_t should_flush_tx, int32_t should_send_ack)
 {
 	if ( nrf24_instance->device_was_initialized == 0 )
 	{
 		return NRF24_INSTANCE_WAS_NOT_INITIALIZED;
+	}
+
+	if (should_flush_tx) //Flush Tx FIFO if needed
+	{
+		// Clear TX FIFO
+		nrf24_instance->csn_low();
+		nrf24_instance->spi_write_byte(NRF24_FLUSH_TX);
+		nrf24_instance->csn_high();
 	}
 
 	uint32_t mistake_code = 0;

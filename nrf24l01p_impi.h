@@ -150,7 +150,7 @@ uint32_t nrf24_enable_pipe2_5(nrf24l01p * nrf24_instance, uint32_t pipe_number, 
 	@name nrf24_send_message
 	@brief Sends message with either acknowledgment or not.
  */
-uint32_t nrf24_send_message(nrf24l01p * nrf24_instance, void *payload, uint32_t payload_size, int32_t send_ac);
+uint32_t nrf24_send_message(nrf24l01p *nrf24_instance,  void *payload, uint32_t payload_size_in_bytes, int32_t should_flush_tx, int32_t should_send_ack);
 
 /*
 	@name nrf24_is_new_data_availiable
