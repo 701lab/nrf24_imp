@@ -85,7 +85,7 @@ uint32_t nrf24_basic_init(nrf24l01p *nrf24_instance)
 	{
 		nrf24_instance->csn_low();
 		nrf24_instance->spi_write_byte(NRF24_W_REGISTER | NRF24_SETUP_RETR);
-		nrf24_instance->spi_write_byte(0x2 | nrf24_wait_1000_us);
+		nrf24_instance->spi_write_byte(0x2 | nrf24_wait_750_us);
 		nrf24_instance->csn_high();
 	}
 
