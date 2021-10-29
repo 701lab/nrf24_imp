@@ -25,7 +25,7 @@ The library allows you to have multiple nrf24l01+ devices connected to a single 
 
 Names of the functions and of the parameters could be different, but the amount of inputs and both input and return types should be the same.
 
-1. **uint8_t spi_write_function(uin8_t byte_to_write)** - SPI write function. Should take one byte of data and send it through desired SPI (whatever hardware or software SPI you use to exchange data with nrf24l01+) in a single byte mode (this is important cause new devices support 2-byte SPI transmission). Should return byte of data that was received during send operation of var1; 
+1. **uint8_t spi_write_function(uint8_t byte_to_write)** - SPI write function. Should take one byte of data and send it through desired SPI (whatever hardware or software SPI you use to exchange data with nrf24l01+) in a single byte mode (this is important cause new devices support 2-byte SPI transmission). Should return byte of data that was received during send operation of var1; 
 2. **void ce_high_function(void)** - Should set MCU/MPU pin connected to the **CE** pin of particular NRF24L01+ device logic high;
 3. **void ce_low_function(void)** - Should set MCU/MPU pin connected to the **CE** pin of particular NRF24L01+ device logic LOW;
 2. **void csn_high_function(void)** - Should set MCU/MPU pin connected to the **CSN** pin of particular NRF24L01+ device logic high;
@@ -40,7 +40,7 @@ It is possible to control multiple nrf24l01+ devices with the same SPI (so the s
 - _csn_low_ - pointer to the **void csn_low(void)** function;
 - _ce_high_ - pointer to the **void ce_high(void)** function;
 - _ce_low_ - pointer to the **void ce_low(void)** function;
-- _spi_write_byte_ - pointer to the **uint8_t spi_write_function(uin8_t byte_to_write)** function;
+- _spi_write_byte_ - pointer to the **uint8_t spi_write_function(uint8_t byte_to_write)** function;
 - _payload_size_in_bytes_ - payload size in bytes. Must be in range on 0 to 32. Must be the same at both transmitter and receiver;
 - _frequency_channel_ - number of the frequency channel that nrf24l01+ will use to transmit data. The frequency step is 1 Mhz. Must be in range of 1 to 124 (carrier frequency will be 2.401- 2.524  GHz). Must be the same at both transmitter and receiver;
 - _power_outout_ - power output of the device. Must be the same at both transmitter and receiver. Must have one of the following values:
